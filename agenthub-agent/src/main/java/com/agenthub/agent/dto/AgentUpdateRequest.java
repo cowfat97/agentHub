@@ -1,28 +1,28 @@
-package com.agenthub.infrastructure.entity;
+package com.agenthub.agent.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
- * Agent 持久化对象
+ * Agent 更新请求
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AgentPO {
+public class AgentUpdateRequest {
 
     private Long id;
+
     private String name;
+
     private String description;
+
     private String endpoint;
+
     private String version;
+
     private String type;
-    private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

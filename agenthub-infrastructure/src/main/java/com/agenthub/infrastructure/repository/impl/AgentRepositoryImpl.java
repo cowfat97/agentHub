@@ -1,12 +1,12 @@
 package com.agenthub.infrastructure.repository.impl;
 
+import com.agenthub.agent.domain.entity.Agent;
+import com.agenthub.agent.domain.repository.AgentRepository;
+import com.agenthub.agent.domain.valueobject.AgentInfo;
 import com.agenthub.common.enums.AgentStatus;
-import com.agenthub.discovery.domain.entity.AgentInfo;
-import com.agenthub.discovery.domain.repository.AgentDiscoveryRepository;
+import com.agenthub.common.utils.SnowflakeIdGenerator;
 import com.agenthub.infrastructure.entity.AgentPO;
 import com.agenthub.infrastructure.mapper.AgentMapper;
-import com.agenthub.registration.domain.entity.Agent;
-import com.agenthub.registration.domain.repository.AgentRegistrationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,16 +15,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Agent Repository Implementation
- * 实现注册领域和发现领域的仓储接口
+ * Agent 仓储实现
+ *
+ * 统一实现注册和发现功能的持久化操作
  */
 @Repository
 @RequiredArgsConstructor
-public class AgentRepositoryImpl implements AgentRegistrationRepository, AgentDiscoveryRepository {
+public class AgentRepositoryImpl implements AgentRepository {
 
     private final AgentMapper agentMapper;
+    private final SnowflakeIdGenerator idGenerator = SnowflakeIdGenerator.getInstance();
 
-    // ==================== PO 转换方法 ====================
+    // ==================== PO 转换 ====================
 
     private Agent toAgent(AgentPO po) {
         if (po == null) {
@@ -36,6 +38,7 @@ public class AgentRepositoryImpl implements AgentRegistrationRepository, AgentDi
                 .description(po.getDescription())
                 .endpoint(po.getEndpoint())
                 .version(po.getVersion())
+                .type(po.getType())
                 .status(AgentStatus.valueOf(po.getStatus()))
                 .createdAt(po.getCreatedAt())
                 .updatedAt(po.getUpdatedAt())
@@ -52,6 +55,7 @@ public class AgentRepositoryImpl implements AgentRegistrationRepository, AgentDi
                 .description(po.getDescription())
                 .endpoint(po.getEndpoint())
                 .version(po.getVersion())
+                .type(po.getType())
                 .status(AgentStatus.valueOf(po.getStatus()))
                 .createdAt(po.getCreatedAt())
                 .updatedAt(po.getUpdatedAt())
@@ -62,19 +66,20 @@ public class AgentRepositoryImpl implements AgentRegistrationRepository, AgentDi
         if (agent == null) {
             return null;
         }
-        AgentPO po = new AgentPO();
-        po.setId(agent.getId());
-        po.setName(agent.getName());
-        po.setDescription(agent.getDescription());
-        po.setEndpoint(agent.getEndpoint());
-        po.setVersion(agent.getVersion());
-        po.setStatus(agent.getStatus().name());
-        po.setCreatedAt(agent.getCreatedAt());
-        po.setUpdatedAt(agent.getUpdatedAt());
-        return po;
+        return AgentPO.builder()
+                .id(agent.getId())
+                .name(agent.getName())
+                .description(agent.getDescription())
+                .endpoint(agent.getEndpoint())
+                .version(agent.getVersion())
+                .type(agent.getType())
+                .status(agent.getStatus() != null ? agent.getStatus().name() : AgentStatus.ONLINE.name())
+                .createdAt(agent.getCreatedAt())
+                .updatedAt(agent.getUpdatedAt())
+                .build();
     }
 
-    // ==================== AgentRegistrationRepository 实现 ====================
+    // ==================== 写操作 ====================
 
     @Override
     public Agent save(Agent agent) {
@@ -98,9 +103,27 @@ public class AgentRepositoryImpl implements AgentRegistrationRepository, AgentDi
     }
 
     @Override
+    public void deleteById(Long id) {
+        agentMapper.deleteById(id);
+    }
+
+    @Override
+    public Long nextId() {
+        return idGenerator.nextId();
+    }
+
+    // ==================== 读操作 ====================
+
+    @Override
     public Agent findById(Long id) {
         AgentPO po = agentMapper.selectById(id);
         return toAgent(po);
+    }
+
+    @Override
+    public AgentInfo findInfoById(Long id) {
+        AgentPO po = agentMapper.selectById(id);
+        return toAgentInfo(po);
     }
 
     @Override
@@ -110,31 +133,21 @@ public class AgentRepositoryImpl implements AgentRegistrationRepository, AgentDi
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return agentMapper.selectByName(name) != null;
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        agentMapper.deleteById(id);
-    }
-
-    // ==================== AgentDiscoveryRepository 实现 ====================
-
-    @Override
-    public AgentInfo findAgentInfoById(Long id) {
-        AgentPO po = agentMapper.selectById(id);
-        return toAgentInfo(po);
-    }
-
-    @Override
-    public AgentInfo findAgentInfoByName(String name) {
+    public AgentInfo findInfoByName(String name) {
         AgentPO po = agentMapper.selectByName(name);
         return toAgentInfo(po);
     }
 
     @Override
-    public List<AgentInfo> findAll() {
+    public List<Agent> findAll() {
+        List<AgentPO> pos = agentMapper.selectAll();
+        return pos.stream()
+                .map(this::toAgent)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AgentInfo> findAllInfo() {
         List<AgentPO> pos = agentMapper.selectAll();
         return pos.stream()
                 .map(this::toAgentInfo)
@@ -142,7 +155,15 @@ public class AgentRepositoryImpl implements AgentRegistrationRepository, AgentDi
     }
 
     @Override
-    public List<AgentInfo> findByStatus(AgentStatus status) {
+    public List<Agent> findByStatus(AgentStatus status) {
+        List<AgentPO> pos = agentMapper.selectByStatus(status.name());
+        return pos.stream()
+                .map(this::toAgent)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AgentInfo> findInfoByStatus(AgentStatus status) {
         List<AgentPO> pos = agentMapper.selectByStatus(status.name());
         return pos.stream()
                 .map(this::toAgentInfo)
@@ -155,6 +176,13 @@ public class AgentRepositoryImpl implements AgentRegistrationRepository, AgentDi
         return pos.stream()
                 .map(this::toAgentInfo)
                 .collect(Collectors.toList());
+    }
+
+    // ==================== 校验操作 ====================
+
+    @Override
+    public boolean existsByName(String name) {
+        return agentMapper.selectByName(name) != null;
     }
 
     @Override

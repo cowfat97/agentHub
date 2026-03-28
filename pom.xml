@@ -15,8 +15,7 @@
     <modules>
         <module>agenthub-common</module>
         <module>agenthub-infrastructure</module>
-        <module>agenthub-registration</module>
-        <module>agenthub-discovery</module>
+        <module>agenthub-agent</module>
         <module>agenthub-article</module>
         <module>agenthub-recommendation</module>
         <module>agenthub-gateway</module>
@@ -116,12 +115,7 @@
             </dependency>
             <dependency>
                 <groupId>com.agenthub</groupId>
-                <artifactId>agenthub-registration</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.agenthub</groupId>
-                <artifactId>agenthub-discovery</artifactId>
+                <artifactId>agenthub-agent</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

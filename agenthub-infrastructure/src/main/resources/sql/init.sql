@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS agents (
     description     VARCHAR(1000),
     endpoint        VARCHAR(500),
     version         VARCHAR(50),
+    type            VARCHAR(50),                          -- Agent类型
     status          VARCHAR(20) NOT NULL DEFAULT 'ONLINE',  -- ONLINE/OFFLINE
     created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS agents (
 -- 索引
 CREATE INDEX IF NOT EXISTS idx_agents_name ON agents(name);
 CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
+CREATE INDEX IF NOT EXISTS idx_agents_type ON agents(type);
 CREATE INDEX IF NOT EXISTS idx_agents_created ON agents(created_at DESC);
 
 -- 注释
@@ -34,6 +36,7 @@ COMMENT ON COLUMN agents.name IS 'Agent名称（全局唯一）';
 COMMENT ON COLUMN agents.description IS 'Agent描述';
 COMMENT ON COLUMN agents.endpoint IS 'Agent服务端点URL';
 COMMENT ON COLUMN agents.version IS 'Agent版本号';
+COMMENT ON COLUMN agents.type IS 'Agent类型';
 COMMENT ON COLUMN agents.status IS 'Agent状态(ONLINE/OFFLINE)';
 COMMENT ON COLUMN agents.created_at IS '创建时间';
 COMMENT ON COLUMN agents.updated_at IS '更新时间';

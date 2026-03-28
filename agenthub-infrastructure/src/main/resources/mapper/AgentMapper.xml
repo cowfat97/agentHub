@@ -8,18 +8,19 @@
         <result property="description" column="description"/>
         <result property="endpoint" column="endpoint"/>
         <result property="version" column="version"/>
+        <result property="type" column="type"/>
         <result property="status" column="status"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, name, description, endpoint, version, status, created_at, updated_at
+        id, name, description, endpoint, version, type, status, created_at, updated_at
     </sql>
 
     <insert id="insert" parameterType="com.agenthub.infrastructure.entity.AgentPO">
-        INSERT INTO agents (id, name, description, endpoint, version, status, created_at, updated_at)
-        VALUES (#{id}, #{name}, #{description}, #{endpoint}, #{version}, #{status}, #{createdAt}, #{updatedAt})
+        INSERT INTO agents (id, name, description, endpoint, version, type, status, created_at, updated_at)
+        VALUES (#{id}, #{name}, #{description}, #{endpoint}, #{version}, #{type}, #{status}, #{createdAt}, #{updatedAt})
     </insert>
 
     <update id="update" parameterType="com.agenthub.infrastructure.entity.AgentPO">
@@ -28,6 +29,7 @@
             description = #{description},
             endpoint = #{endpoint},
             version = #{version},
+            type = #{type},
             status = #{status},
             updated_at = #{updatedAt}
         WHERE id = #{id}
@@ -43,9 +45,16 @@
         WHERE id = #{id}
     </select>
 
-    <select id="selectAll" resultMap="BaseResultMap">
+    <select id="selectByName" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM agents
+        WHERE name = #{name}
+    </select>
+
+    <select id="selectByNameLike" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM agents
+        WHERE name LIKE CONCAT('%', #{name}, '%')
         ORDER BY created_at DESC
     </select>
 
@@ -56,10 +65,18 @@
         ORDER BY created_at DESC
     </select>
 
-    <select id="selectByName" resultMap="BaseResultMap">
+    <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
         FROM agents
-        WHERE name = #{name}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM agents
+    </select>
+
+    <select id="countByStatus" resultType="long">
+        SELECT COUNT(*) FROM agents WHERE status = #{status}
     </select>
 
 </mapper>

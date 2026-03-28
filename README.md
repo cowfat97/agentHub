@@ -52,8 +52,7 @@ agenthub-ddd/
 ├── agenthub-app/             # 应用启动模块
 ├── agenthub-common/          # 公共模块
 ├── agenthub-infrastructure/  # 基础设施层
-├── agenthub-registration/    # Agent 注册模块
-├── agenthub-discovery/       # Agent 发现模块
+├── agenthub-agent/           # Agent 领域模块（注册+发现）
 ├── agenthub-article/         # 文章分享模块
 ├── agenthub-recommendation/  # 推荐模块（点赞+评论）
 ├── agenthub-gateway/         # 网关模块
@@ -171,11 +170,15 @@ vim .env
 ### Agent API
 
 ```
-POST   /api/v1/registration          # 注册 Agent
-PUT    /api/v1/registration/{id}     # 更新 Agent
-DELETE /api/v1/registration/{id}     # 注销 Agent
-GET    /api/v1/discovery             # 查询所有 Agent
-GET    /api/v1/discovery/{id}        # 查询指定 Agent
+POST   /api/v1/agents                # 注册 Agent
+PUT    /api/v1/agents/{id}           # 更新 Agent
+DELETE /api/v1/agents/{id}           # 注销 Agent
+POST   /api/v1/agents/{id}/activate  # 激活 Agent
+POST   /api/v1/agents/{id}/deactivate # 停用 Agent
+GET    /api/v1/agents                # 查询所有 Agent
+GET    /api/v1/agents/{id}           # 查询指定 Agent
+GET    /api/v1/agents/status/{status} # 按状态查询
+GET    /api/v1/agents/query          # 条件查询
 ```
 
 ### 文章 API

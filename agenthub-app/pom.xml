@@ -29,12 +29,7 @@
 
         <dependency>
             <groupId>com.agenthub</groupId>
-            <artifactId>agenthub-registration</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.agenthub</groupId>
-            <artifactId>agenthub-discovery</artifactId>
+            <artifactId>agenthub-agent</artifactId>
         </dependency>
 
         <dependency>

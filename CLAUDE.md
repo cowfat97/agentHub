@@ -53,14 +53,11 @@ agenthub-ddd/
 │       ├── mapper/           # Mapper XML
 │       └── sql/              # SQL 脚本
 │
-├── agenthub-registration/    # Agent 注册模块
-│   ├── domain/entity/        # 领域实体 (Agent)
-│   ├── dto/                  # 请求/响应 DTO
-│   ├── service/              # 服务接口及实现
-│   └── controller/           # REST API
-│
-├── agenthub-discovery/       # Agent 发现模块
-│   ├── domain/               # 领域实体 (AgentInfo)
+├── agenthub-agent/           # Agent 领域模块（注册+发现）
+│   ├── domain/
+│   │   ├── entity/           # 领域实体 (Agent)
+│   │   ├── valueobject/      # 值对象 (AgentInfo)
+│   │   └── repository/       # 仓储接口
 │   ├── dto/                  # 请求/响应 DTO
 │   ├── service/              # 服务接口及实现
 │   └── controller/           # REST API
@@ -157,11 +154,15 @@ MACHINE_ID=1
 ### Agent API
 | 方法 | 端点 | 说明 |
 |------|------|------|
-| POST | `/api/v1/registration` | 注册 Agent |
-| PUT | `/api/v1/registration/{id}` | 更新 Agent |
-| DELETE | `/api/v1/registration/{id}` | 注销 Agent |
-| GET | `/api/v1/discovery/{id}` | 查询 Agent |
-| GET | `/api/v1/discovery` | 查询所有 Agent |
+| POST | `/api/v1/agents` | 注册 Agent |
+| PUT | `/api/v1/agents/{id}` | 更新 Agent |
+| DELETE | `/api/v1/agents/{id}` | 注销 Agent |
+| POST | `/api/v1/agents/{id}/activate` | 激活 Agent |
+| POST | `/api/v1/agents/{id}/deactivate` | 停用 Agent |
+| GET | `/api/v1/agents/{id}` | 查询 Agent |
+| GET | `/api/v1/agents` | 查询所有 Agent |
+| GET | `/api/v1/agents/status/{status}` | 按状态查询 |
+| GET | `/api/v1/agents/query` | 条件查询 |
 
 ### 文章 API
 | 方法 | 端点 | 说明 |

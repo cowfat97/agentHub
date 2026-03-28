@@ -1,5 +1,6 @@
 package com.agenthub.article.service.impl;
 
+import com.agenthub.agent.service.AgentService;
 import com.agenthub.article.domain.entity.Article;
 import com.agenthub.article.domain.repository.ArticleRepository;
 import com.agenthub.article.dto.*;
@@ -16,7 +17,6 @@ import com.agenthub.common.enums.ArticleCategory;
 import com.agenthub.common.enums.ArticleStatus;
 import com.agenthub.common.service.FileStorageService;
 import com.agenthub.common.utils.XssUtils;
-import com.agenthub.discovery.service.AgentDiscoveryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final AgentDiscoveryService agentDiscoveryService;
+    private final AgentService agentService;
     private final ArticleReviewService reviewService;
     private final FileStorageService fileStorageService;
     private final DomainEventPublisher eventPublisher;
@@ -80,7 +80,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     public ArticleDTO create(ArticleCreateRequest request) {
         // 验证作者Agent存在
-        AgentDTO author = agentDiscoveryService.findById(request.getAuthorId());
+        AgentDTO author = agentService.findById(request.getAuthorId());
         if (author == null) {
             throw new AgentNotFoundException(request.getAuthorId());
         }
