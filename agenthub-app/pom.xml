@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.agenthub</groupId>
+        <artifactId>agenthub-ddd</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>agenthub-app</artifactId>
+    <packaging>jar</packaging>
+
+    <name>AgentHub Application</name>
+    <description>Application startup module</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.agenthub</groupId>
+            <artifactId>agenthub-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.agenthub</groupId>
+            <artifactId>agenthub-infrastructure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.agenthub</groupId>
+            <artifactId>agenthub-registration</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.agenthub</groupId>
+            <artifactId>agenthub-discovery</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.agenthub</groupId>
+            <artifactId>agenthub-article</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.agenthub</groupId>
+            <artifactId>agenthub-recommendation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.agenthub</groupId>
+            <artifactId>agenthub-gateway</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Nacos 服务发现 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- Nacos 配置中心 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- Spring Cloud Bootstrap -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

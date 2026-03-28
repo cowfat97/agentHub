@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agenthub.gateway.mapper.RequestLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.agenthub.gateway.entity.RequestLog">
+        <id property="id" column="id"/>
+        <result property="traceId" column="trace_id"/>
+        <result property="method" column="method"/>
+        <result property="path" column="path"/>
+        <result property="url" column="url"/>
+        <result property="queryString" column="query_string"/>
+        <result property="headers" column="headers"/>
+        <result property="requestBody" column="request_body"/>
+        <result property="status" column="status"/>
+        <result property="responseBody" column="response_body"/>
+        <result property="clientIp" column="client_ip"/>
+        <result property="realIp" column="real_ip"/>
+        <result property="userAgent" column="user_agent"/>
+        <result property="referer" column="referer"/>
+        <result property="duration" column="duration"/>
+        <result property="hasError" column="has_error"/>
+        <result property="errorMessage" column="error_message"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, trace_id, method, path, url, query_string, headers, request_body,
+        status, response_body, client_ip, real_ip, user_agent, referer,
+        duration, has_error, error_message, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.agenthub.gateway.entity.RequestLog">
+        INSERT INTO request_logs (
+            id, trace_id, method, path, url, query_string, headers, request_body,
+            status, response_body, client_ip, real_ip, user_agent, referer,
+            duration, has_error, error_message, created_at
+        ) VALUES (
+            #{id}, #{traceId}, #{method}, #{path}, #{url}, #{queryString}, #{headers}, #{requestBody},
+            #{status}, #{responseBody}, #{clientIp}, #{realIp}, #{userAgent}, #{referer},
+            #{duration}, #{hasError}, #{errorMessage}, #{createdAt}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM request_logs
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByTraceId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM request_logs
+        WHERE trace_id = #{traceId}
+    </select>
+
+    <select id="selectByPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM request_logs
+        <where>
+            <if test="method != null and method != ''">
+                AND method = #{method}
+            </if>
+            <if test="path != null and path != ''">
+                AND path LIKE CONCAT('%', #{path}, '%')
+            </if>
+            <if test="clientIp != null and clientIp != ''">
+                AND client_ip = #{clientIp}
+            </if>
+            <if test="hasError != null">
+                AND has_error = #{hasError}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*)
+        FROM request_logs
+        <where>
+            <if test="method != null and method != ''">
+                AND method = #{method}
+            </if>
+            <if test="path != null and path != ''">
+                AND path LIKE CONCAT('%', #{path}, '%')
+            </if>
+            <if test="clientIp != null and clientIp != ''">
+                AND client_ip = #{clientIp}
+            </if>
+            <if test="hasError != null">
+                AND has_error = #{hasError}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteBeforeDays">
+        DELETE FROM request_logs
+        WHERE created_at &lt; NOW() - make_interval(days => #{days})
+    </delete>
+
+</mapper>

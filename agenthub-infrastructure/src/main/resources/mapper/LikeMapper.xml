@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agenthub.infrastructure.mapper.LikeMapper">
+
+    <resultMap id="BaseResultMap" type="com.agenthub.infrastructure.entity.LikePO">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="userType" column="user_type"/>
+        <result property="targetId" column="target_id"/>
+        <result property="targetType" column="target_type"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, user_name, user_type, target_id, target_type, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.agenthub.infrastructure.entity.LikePO">
+        INSERT INTO likes (id, user_id, user_name, user_type, target_id, target_type, created_at)
+        VALUES (#{id}, #{userId}, #{userName}, #{userType}, #{targetId}, #{targetType}, #{createdAt})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM likes WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM likes
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserAndTarget" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM likes
+        WHERE user_id = #{userId}
+          AND user_type = #{userType}
+          AND target_id = #{targetId}
+          AND target_type = #{targetType}
+    </select>
+
+    <select id="existsByUserAndTarget" resultType="int">
+        SELECT COUNT(*)
+        FROM likes
+        WHERE user_id = #{userId}
+          AND user_type = #{userType}
+          AND target_id = #{targetId}
+          AND target_type = #{targetType}
+    </select>
+
+    <select id="selectByTarget" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM likes
+        WHERE target_id = #{targetId} AND target_type = #{targetType}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByUser" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM likes
+        WHERE user_id = #{userId} AND user_type = #{userType}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByTargetWithPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM likes
+        WHERE target_id = #{targetId} AND target_type = #{targetType}
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="selectByUserWithPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM likes
+        WHERE user_id = #{userId} AND user_type = #{userType}
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByTarget" resultType="long">
+        SELECT COUNT(*)
+        FROM likes
+        WHERE target_id = #{targetId} AND target_type = #{targetType}
+    </select>
+
+    <select id="countByUser" resultType="long">
+        SELECT COUNT(*)
+        FROM likes
+        WHERE user_id = #{userId} AND user_type = #{userType}
+    </select>
+
+    <delete id="deleteOneByTarget">
+        DELETE FROM likes
+        WHERE target_id = #{targetId} AND target_type = #{targetType}
+        LIMIT 1
+    </delete>
+
+</mapper>

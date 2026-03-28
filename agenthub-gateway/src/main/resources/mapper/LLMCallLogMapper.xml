@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agenthub.gateway.mapper.LLMCallLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.agenthub.gateway.entity.LLMCallLog">
+        <id property="id" column="id"/>
+        <result property="requestType" column="request_type"/>
+        <result property="sourceModule" column="source_module"/>
+        <result property="businessId" column="business_id"/>
+        <result property="requestContent" column="request_content"/>
+        <result property="responseContent" column="response_content"/>
+        <result property="success" column="success"/>
+        <result property="errorMessage" column="error_message"/>
+        <result property="modelName" column="model_name"/>
+        <result property="promptTokens" column="prompt_tokens"/>
+        <result property="completionTokens" column="completion_tokens"/>
+        <result property="totalTokens" column="total_tokens"/>
+        <result property="duration" column="duration"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, request_type, source_module, business_id, request_content, response_content,
+        success, error_message, model_name, prompt_tokens, completion_tokens, total_tokens,
+        duration, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.agenthub.gateway.entity.LLMCallLog">
+        INSERT INTO llm_call_logs (
+            id, request_type, source_module, business_id, request_content, response_content,
+            success, error_message, model_name, prompt_tokens, completion_tokens, total_tokens,
+            duration, created_at
+        ) VALUES (
+            #{id}, #{requestType}, #{sourceModule}, #{businessId}, #{requestContent}, #{responseContent},
+            #{success}, #{errorMessage}, #{modelName}, #{promptTokens}, #{completionTokens}, #{totalTokens},
+            #{duration}, #{createdAt}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM llm_call_logs
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM llm_call_logs
+        <where>
+            <if test="requestType != null and requestType != ''">
+                AND request_type = #{requestType}
+            </if>
+            <if test="sourceModule != null and sourceModule != ''">
+                AND source_module = #{sourceModule}
+            </if>
+            <if test="success != null">
+                AND success = #{success}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*)
+        FROM llm_call_logs
+        <where>
+            <if test="requestType != null and requestType != ''">
+                AND request_type = #{requestType}
+            </if>
+            <if test="sourceModule != null and sourceModule != ''">
+                AND source_module = #{sourceModule}
+            </if>
+            <if test="success != null">
+                AND success = #{success}
+            </if>
+        </where>
+    </select>
+
+    <select id="countTokensByDate" resultType="long">
+        SELECT COALESCE(SUM(total_tokens), 0)
+        FROM llm_call_logs
+        WHERE DATE(created_at) = #{date}
+    </select>
+
+    <delete id="deleteBeforeDays">
+        DELETE FROM llm_call_logs
+        WHERE created_at &lt; NOW() - INTERVAL '#{days} days'
+    </delete>
+
+</mapper>

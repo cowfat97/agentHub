@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agenthub.infrastructure.mapper.CommentMapper">
+
+    <resultMap id="BaseResultMap" type="com.agenthub.infrastructure.entity.CommentPO">
+        <id property="id" column="id"/>
+        <result property="articleId" column="article_id"/>
+        <result property="commenterId" column="commenter_id"/>
+        <result property="commenterName" column="commenter_name"/>
+        <result property="commenterType" column="commenter_type"/>
+        <result property="content" column="content"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="rootId" column="root_id"/>
+        <result property="replyToId" column="reply_to_id"/>
+        <result property="replyToName" column="reply_to_name"/>
+        <result property="status" column="status"/>
+        <result property="reviewReason" column="review_reason"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, article_id, commenter_id, commenter_name, commenter_type, content,
+        parent_id, root_id, reply_to_id, reply_to_name, status, review_reason,
+        like_count, created_at, updated_at
+    </sql>
+
+    <insert id="insert" parameterType="com.agenthub.infrastructure.entity.CommentPO">
+        INSERT INTO comments (id, article_id, commenter_id, commenter_name, commenter_type,
+                             content, parent_id, root_id, reply_to_id, reply_to_name,
+                             status, review_reason, like_count, created_at, updated_at)
+        VALUES (#{id}, #{articleId}, #{commenterId}, #{commenterName}, #{commenterType},
+                #{content}, #{parentId}, #{rootId}, #{replyToId}, #{replyToName},
+                #{status}, #{reviewReason}, #{likeCount}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update" parameterType="com.agenthub.infrastructure.entity.CommentPO">
+        UPDATE comments
+        SET status = #{status},
+            review_reason = #{reviewReason},
+            like_count = #{likeCount},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM comments WHERE id = #{id}
+    </delete>
+
+    <update id="incrementLikeCount">
+        UPDATE comments SET like_count = like_count + 1 WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comments
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByArticleId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comments
+        WHERE article_id = #{articleId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByArticleIdAndStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comments
+        WHERE article_id = #{articleId} AND status = #{status}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectRepliesByRootId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comments
+        WHERE root_id = #{rootId} AND parent_id IS NOT NULL
+        ORDER BY created_at ASC
+    </select>
+
+    <select id="selectByStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comments
+        WHERE status = #{status}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByCommenter" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comments
+        WHERE commenter_id = #{commenterId} AND commenter_type = #{commenterType}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByArticleIdAndStatusWithPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM comments
+        WHERE article_id = #{articleId} AND status = #{status} AND parent_id IS NULL
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByArticleIdAndStatus" resultType="long">
+        SELECT COUNT(*)
+        FROM comments
+        WHERE article_id = #{articleId} AND status = #{status} AND parent_id IS NULL
+    </select>
+
+    <select id="countRepliesByRootId" resultType="long">
+        SELECT COUNT(*)
+        FROM comments
+        WHERE root_id = #{rootId} AND parent_id IS NOT NULL
+    </select>
+
+</mapper>

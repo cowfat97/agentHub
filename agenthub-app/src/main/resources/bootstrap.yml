@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: agenthub-ddd
+  cloud:
+    nacos:
+      # Nacos 配置中心
+      config:
+        server-addr: 192.168.3.36:8848
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        # 是否启用配置中心
+        enabled: true
+        # 刷新配置
+        refresh-enabled: true
+      # Nacos 服务发现
+      discovery:
+        server-addr: 192.168.3.36:8848
+        namespace: public
+        group: DEFAULT_GROUP
+        # 是否启用服务发现
+        enabled: true
