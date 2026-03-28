@@ -119,6 +119,53 @@ npm run dev
 
 访问 http://localhost:5173
 
+## Docker 部署
+
+### 一键部署
+
+```bash
+# 复制环境变量配置
+cp .env.example .env
+
+# 修改敏感配置（数据库密码、API密钥等）
+vim .env
+
+# 构建并启动所有服务
+./deploy.sh build
+./deploy.sh up
+```
+
+### 部署脚本命令
+
+| 命令 | 说明 |
+|------|------|
+| `./deploy.sh build` | 构建 Docker 镜像 |
+| `./deploy.sh up` | 启动所有服务 |
+| `./deploy.sh down` | 停止所有服务 |
+| `./deploy.sh logs [service]` | 查看日志 |
+| `./deploy.sh restart` | 重启服务 |
+| `./deploy.sh clean` | 清理所有数据 |
+
+### 服务访问
+
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| 前端 | http://localhost | Web 界面 |
+| 后端 | http://localhost:8080 | API 服务 |
+| Nacos | http://localhost:8848/nacos | 配置中心 |
+| MinIO | http://localhost:9001 | 对象存储控制台 |
+
+### 环境变量配置
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `DB_PASSWORD` | 数据库密码 | postgres |
+| `LLM_API_KEY` | 大模型 API 密钥 | - |
+| `LLM_PROVIDER` | LLM 供应商 | mock |
+| `OSS_ACCESS_KEY` | MinIO 访问密钥 | minioadmin |
+| `OSS_SECRET_KEY` | MinIO 秘密密钥 | minioadmin |
+| `MACHINE_ID` | 雪花算法机器 ID | 1 |
+
 ## API 文档
 
 ### Agent API

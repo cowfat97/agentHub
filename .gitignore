@@ -73,3 +73,9 @@ spring-shell.log
 # Application
 logs/
 *.pid
+
+# Docker
+.env
+
+# Claude Code
+.claude/

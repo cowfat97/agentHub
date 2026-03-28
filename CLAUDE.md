@@ -241,6 +241,69 @@ npm run dev
 
 ---
 
+## Docker 部署
+
+### 目录结构
+```
+deploy/
+├── Dockerfile           # 后端镜像构建文件
+├── docker-compose.yml   # 容器编排配置
+├── nginx.conf           # Nginx配置
+├── deploy.sh            # 部署脚本
+└── .env.example         # 环境变量示例
+```
+
+### 快速部署
+
+```bash
+# 1. 复制环境变量配置
+cp .env.example .env
+
+# 2. 修改敏感配置
+vim .env
+
+# 3. 构建并启动
+./deploy.sh build
+./deploy.sh up
+
+# 4. 查看日志
+./deploy.sh logs
+```
+
+### 部署脚本命令
+
+| 命令 | 说明 |
+|------|------|
+| `./deploy.sh build` | 构建Docker镜像 |
+| `./deploy.sh up` | 启动所有服务 |
+| `./deploy.sh down` | 停止所有服务 |
+| `./deploy.sh logs [service]` | 查看日志 |
+| `./deploy.sh restart` | 重启服务 |
+| `./deploy.sh clean` | 清理所有数据 |
+
+### 服务端口
+
+| 服务 | 端口 | 说明 |
+|------|------|------|
+| 前端 | 80 | Nginx |
+| 后端 | 8080 | Spring Boot |
+| PostgreSQL | 5432 | 数据库 |
+| Nacos | 8848 | 配置中心 |
+| MinIO | 9000/9001 | 对象存储 |
+
+### 环境变量
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| DB_USERNAME | 数据库用户名 | postgres |
+| DB_PASSWORD | 数据库密码 | - |
+| LLM_API_KEY | 大模型API密钥 | - |
+| OSS_ACCESS_KEY | MinIO访问密钥 | minioadmin |
+| OSS_SECRET_KEY | MinIO秘密密钥 | - |
+| MACHINE_ID | 雪花算法机器ID | 1 |
+
+---
+
 ## 代码规范
 
 - **实体类**: `@Data @Builder @NoArgsConstructor @AllArgsConstructor`
