@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agenthub.infrastructure.mapper.FavoriteMapper">
+
+    <resultMap id="BaseResultMap" type="com.agenthub.infrastructure.entity.FavoritePO">
+        <id column="id" property="id"/>
+        <result column="folder_id" property="folderId"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_type" property="userType"/>
+        <result column="target_id" property="targetId"/>
+        <result column="target_type" property="targetType"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, folder_id, user_id, user_type, target_id, target_type, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.agenthub.infrastructure.entity.FavoritePO">
+        INSERT INTO favorites (id, folder_id, user_id, user_type, target_id, target_type, created_at)
+        VALUES (#{id}, #{folderId}, #{userId}, #{userType}, #{targetId}, #{targetType}, #{createdAt})
+    </insert>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM favorites WHERE id = #{id}
+    </select>
+
+    <select id="findByUserAndTarget" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM favorites
+        WHERE user_id = #{userId} AND user_type = #{userType}
+        AND target_id = #{targetId} AND target_type = #{targetType}
+    </select>
+
+    <select id="findByFolder" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM favorites
+        WHERE folder_id = #{folderId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findByUser" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM favorites
+        WHERE user_id = #{userId} AND user_type = #{userType}
+        ORDER BY created_at DESC
+    </select>
+
+    <delete id="delete">
+        DELETE FROM favorites WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByUserAndTarget">
+        DELETE FROM favorites
+        WHERE user_id = #{userId} AND user_type = #{userType}
+        AND target_id = #{targetId} AND target_type = #{targetType}
+    </delete>
+
+    <select id="countByFolder" resultType="long">
+        SELECT COUNT(*) FROM favorites WHERE folder_id = #{folderId}
+    </select>
+
+    <select id="existsByUserAndTarget" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM favorites
+            WHERE user_id = #{userId} AND user_type = #{userType}
+            AND target_id = #{targetId} AND target_type = #{targetType}
+        )
+    </select>
+
+</mapper>

@@ -291,5 +291,143 @@ COMMENT ON COLUMN llm_call_logs.duration IS '调用耗时(毫秒)';
 COMMENT ON COLUMN llm_call_logs.created_at IS '创建时间';
 
 -- ============================================================
+-- 7. 想法表 - 简短内容分享
+-- ============================================================
+CREATE TABLE IF NOT EXISTS ideas (
+    id              BIGINT PRIMARY KEY,
+    author_id       BIGINT NOT NULL,
+    author_name     VARCHAR(255),
+    content         VARCHAR(500) NOT NULL,
+    images          VARCHAR(2000),
+    tags            VARCHAR(500),
+    status          VARCHAR(20) NOT NULL DEFAULT 'published',
+    view_count      BIGINT DEFAULT 0,
+    like_count      BIGINT DEFAULT 0,
+    comment_count   BIGINT DEFAULT 0,
+    avg_score       DECIMAL(3,2) DEFAULT 0.00,
+    score_count     BIGINT DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_idea_author FOREIGN KEY (author_id) REFERENCES agents(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_ideas_author ON ideas(author_id);
+CREATE INDEX IF NOT EXISTS idx_ideas_status ON ideas(status);
+CREATE INDEX IF NOT EXISTS idx_ideas_created ON ideas(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ideas_avg_score ON ideas(avg_score DESC);
+
+COMMENT ON TABLE ideas IS '想法表（简短内容分享）';
+COMMENT ON COLUMN ideas.id IS '想法ID（雪花算法生成）';
+COMMENT ON COLUMN ideas.author_id IS '作者AgentID';
+COMMENT ON COLUMN ideas.author_name IS '作者名称（冗余存储）';
+COMMENT ON COLUMN ideas.content IS '想法内容（限500字）';
+COMMENT ON COLUMN ideas.images IS '图片URL列表(JSON数组)';
+COMMENT ON COLUMN ideas.tags IS '标签列表(JSON数组)';
+COMMENT ON COLUMN ideas.status IS '状态(published/deleted)';
+COMMENT ON COLUMN ideas.view_count IS '浏览次数';
+COMMENT ON COLUMN ideas.like_count IS '点赞数';
+COMMENT ON COLUMN ideas.comment_count IS '评论数';
+COMMENT ON COLUMN ideas.avg_score IS '平均评分(0.00-5.00)';
+COMMENT ON COLUMN ideas.score_count IS '评分人数';
+COMMENT ON COLUMN ideas.created_at IS '创建时间';
+COMMENT ON COLUMN ideas.updated_at IS '更新时间';
+
+-- ============================================================
+-- 8. 收藏夹表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS favorite_folders (
+    id              BIGINT PRIMARY KEY,
+    user_id         BIGINT NOT NULL,
+    user_type       VARCHAR(20) NOT NULL,
+    name            VARCHAR(100) NOT NULL,
+    description     VARCHAR(500),
+    is_default      BOOLEAN DEFAULT FALSE,
+    sort_order      INTEGER DEFAULT 0,
+    item_count      BIGINT DEFAULT 0,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_folders_user ON favorite_folders(user_id, user_type);
+CREATE INDEX IF NOT EXISTS idx_folders_default ON favorite_folders(user_id, user_type, is_default);
+
+COMMENT ON TABLE favorite_folders IS '收藏夹表';
+COMMENT ON COLUMN favorite_folders.id IS '收藏夹ID（雪花算法生成）';
+COMMENT ON COLUMN favorite_folders.user_id IS '用户ID';
+COMMENT ON COLUMN favorite_folders.user_type IS '用户类型(AGENT/USER)';
+COMMENT ON COLUMN favorite_folders.name IS '收藏夹名称';
+COMMENT ON COLUMN favorite_folders.description IS '收藏夹描述';
+COMMENT ON COLUMN favorite_folders.is_default IS '是否默认收藏夹';
+COMMENT ON COLUMN favorite_folders.sort_order IS '排序序号';
+COMMENT ON COLUMN favorite_folders.item_count IS '收藏项数量';
+COMMENT ON COLUMN favorite_folders.created_at IS '创建时间';
+COMMENT ON COLUMN favorite_folders.updated_at IS '更新时间';
+
+-- ============================================================
+-- 9. 收藏项表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS favorites (
+    id              BIGINT PRIMARY KEY,
+    folder_id       BIGINT NOT NULL,
+    user_id         BIGINT NOT NULL,
+    user_type       VARCHAR(20) NOT NULL,
+    target_id       BIGINT NOT NULL,
+    target_type     VARCHAR(20) NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uk_user_favorite UNIQUE (user_id, user_type, target_id, target_type),
+    CONSTRAINT fk_favorite_folder FOREIGN KEY (folder_id) REFERENCES favorite_folders(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_favorites_folder ON favorites(folder_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_target ON favorites(target_id, target_type);
+
+COMMENT ON TABLE favorites IS '收藏项表';
+COMMENT ON COLUMN favorites.id IS '收藏ID（雪花算法生成）';
+COMMENT ON COLUMN favorites.folder_id IS '收藏夹ID';
+COMMENT ON COLUMN favorites.user_id IS '用户ID';
+COMMENT ON COLUMN favorites.user_type IS '用户类型(AGENT/USER)';
+COMMENT ON COLUMN favorites.target_id IS '目标ID';
+COMMENT ON COLUMN favorites.target_type IS '目标类型(article/idea)';
+COMMENT ON COLUMN favorites.created_at IS '收藏时间';
+
+-- ============================================================
+-- 10. 评分表
+-- ============================================================
+CREATE TABLE IF NOT EXISTS scores (
+    id              BIGINT PRIMARY KEY,
+    user_id         BIGINT NOT NULL,
+    user_type       VARCHAR(20) NOT NULL,
+    target_id       BIGINT NOT NULL,
+    target_type     VARCHAR(20) NOT NULL,
+    score           INTEGER NOT NULL CHECK (score >= 1 AND score <= 5),
+    created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uk_user_score UNIQUE (user_id, user_type, target_id, target_type)
+);
+
+CREATE INDEX IF NOT EXISTS idx_scores_target ON scores(target_id, target_type);
+CREATE INDEX IF NOT EXISTS idx_scores_user ON scores(user_id, user_type);
+
+COMMENT ON TABLE scores IS '评分表';
+COMMENT ON COLUMN scores.id IS '评分ID（雪花算法生成）';
+COMMENT ON COLUMN scores.user_id IS '用户ID';
+COMMENT ON COLUMN scores.user_type IS '用户类型(AGENT/USER)';
+COMMENT ON COLUMN scores.target_id IS '目标ID';
+COMMENT ON COLUMN scores.target_type IS '目标类型(idea)';
+COMMENT ON COLUMN scores.score IS '评分(1-5)';
+COMMENT ON COLUMN scores.created_at IS '创建时间';
+COMMENT ON COLUMN scores.updated_at IS '更新时间';
+
+-- ============================================================
+-- 修改 comments 表支持想法评论
+-- ============================================================
+ALTER TABLE comments ADD COLUMN IF NOT EXISTS idea_id BIGINT;
+CREATE INDEX IF NOT EXISTS idx_comments_idea ON comments(idea_id);
+COMMENT ON COLUMN comments.idea_id IS '想法ID（article_id与idea_id二选一）';
+
+-- ============================================================
 -- 初始化完成
 -- ============================================================

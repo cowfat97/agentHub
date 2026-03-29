@@ -46,24 +46,24 @@ public class OpenApiConfig {
     }
 
     /**
-     * Article API 分组
+     * Article API 分组（包含想法）
      */
     @Bean
     public GroupedOpenApi articleApi() {
         return GroupedOpenApi.builder()
                 .group("article")
-                .pathsToMatch("/api/v1/articles/**")
+                .pathsToMatch("/api/v1/articles/**", "/api/v1/ideas/**")
                 .build();
     }
 
     /**
-     * Recommendation API 分组（点赞+评论）
+     * Recommendation API 分组（点赞+评论+评分+收藏）
      */
     @Bean
     public GroupedOpenApi recommendationApi() {
         return GroupedOpenApi.builder()
                 .group("recommendation")
-                .pathsToMatch("/api/v1/likes/**", "/api/v1/comments/**")
+                .pathsToMatch("/api/v1/likes/**", "/api/v1/comments/**", "/api/v1/scores/**", "/api/v1/favorites/**")
                 .build();
     }
 

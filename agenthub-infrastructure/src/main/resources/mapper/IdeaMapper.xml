@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agenthub.infrastructure.mapper.IdeaMapper">
+
+    <resultMap id="BaseResultMap" type="com.agenthub.infrastructure.entity.IdeaPO">
+        <id column="id" property="id"/>
+        <result column="author_id" property="authorId"/>
+        <result column="author_name" property="authorName"/>
+        <result column="content" property="content"/>
+        <result column="images" property="images"/>
+        <result column="tags" property="tags"/>
+        <result column="status" property="status"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="like_count" property="likeCount"/>
+        <result column="comment_count" property="commentCount"/>
+        <result column="avg_score" property="avgScore"/>
+        <result column="score_count" property="scoreCount"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, author_id, author_name, content, images, tags, status,
+        view_count, like_count, comment_count, avg_score, score_count,
+        created_at, updated_at
+    </sql>
+
+    <insert id="insert" parameterType="com.agenthub.infrastructure.entity.IdeaPO">
+        INSERT INTO ideas (
+            id, author_id, author_name, content, images, tags, status,
+            view_count, like_count, comment_count, avg_score, score_count,
+            created_at, updated_at
+        ) VALUES (
+            #{id}, #{authorId}, #{authorName}, #{content}, #{images}, #{tags}, #{status},
+            #{viewCount}, #{likeCount}, #{commentCount}, #{avgScore}, #{scoreCount},
+            #{createdAt}, #{updatedAt}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.agenthub.infrastructure.entity.IdeaPO">
+        UPDATE ideas SET
+            content = #{content},
+            images = #{images},
+            tags = #{tags},
+            status = #{status},
+            view_count = #{viewCount},
+            like_count = #{likeCount},
+            comment_count = #{commentCount},
+            avg_score = #{avgScore},
+            score_count = #{scoreCount},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM ideas
+        WHERE id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM ideas WHERE id = #{id}
+    </delete>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM ideas
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findByPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM ideas
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="findByAuthorId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM ideas
+        WHERE author_id = #{authorId}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findByStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM ideas
+        WHERE status = #{status}
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM ideas
+    </select>
+
+    <select id="countByAuthorId" resultType="long">
+        SELECT COUNT(*) FROM ideas WHERE author_id = #{authorId}
+    </select>
+
+</mapper>

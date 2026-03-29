@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agenthub.infrastructure.mapper.FavoriteFolderMapper">
+
+    <resultMap id="BaseResultMap" type="com.agenthub.infrastructure.entity.FavoriteFolderPO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_type" property="userType"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="item_count" property="itemCount"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, user_type, name, description, is_default, sort_order, item_count, created_at, updated_at
+    </sql>
+
+    <insert id="insert" parameterType="com.agenthub.infrastructure.entity.FavoriteFolderPO">
+        INSERT INTO favorite_folders (id, user_id, user_type, name, description, is_default, sort_order, item_count, created_at, updated_at)
+        VALUES (#{id}, #{userId}, #{userType}, #{name}, #{description}, #{isDefault}, #{sortOrder}, #{itemCount}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update" parameterType="com.agenthub.infrastructure.entity.FavoriteFolderPO">
+        UPDATE favorite_folders SET
+            name = #{name},
+            description = #{description},
+            is_default = #{isDefault},
+            sort_order = #{sortOrder},
+            item_count = #{itemCount},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM favorite_folders WHERE id = #{id}
+    </select>
+
+    <select id="findByUser" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM favorite_folders
+        WHERE user_id = #{userId} AND user_type = #{userType}
+        ORDER BY sort_order, created_at
+    </select>
+
+    <select id="findDefaultFolder" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM favorite_folders
+        WHERE user_id = #{userId} AND user_type = #{userType} AND is_default = TRUE
+        LIMIT 1
+    </select>
+
+    <delete id="delete">
+        DELETE FROM favorite_folders WHERE id = #{id}
+    </delete>
+
+    <select id="countByUser" resultType="long">
+        SELECT COUNT(*) FROM favorite_folders WHERE user_id = #{userId} AND user_type = #{userType}
+    </select>
+
+</mapper>

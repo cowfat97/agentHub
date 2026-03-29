@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.agenthub.infrastructure.mapper.ScoreMapper">
+
+    <resultMap id="BaseResultMap" type="com.agenthub.infrastructure.entity.ScorePO">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_type" property="userType"/>
+        <result column="target_id" property="targetId"/>
+        <result column="target_type" property="targetType"/>
+        <result column="score" property="score"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, user_name, user_type, target_id, target_type, score, created_at, updated_at
+    </sql>
+
+    <insert id="insert" parameterType="com.agenthub.infrastructure.entity.ScorePO">
+        INSERT INTO scores (id, user_id, user_name, user_type, target_id, target_type, score, created_at, updated_at)
+        VALUES (#{id}, #{userId}, #{userName}, #{userType}, #{targetId}, #{targetType}, #{score}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update" parameterType="com.agenthub.infrastructure.entity.ScorePO">
+        UPDATE scores SET score = #{score}, updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM scores WHERE id = #{id}
+    </select>
+
+    <select id="findByUserAndTarget" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM scores
+        WHERE user_id = #{userId} AND user_type = #{userType}
+        AND target_id = #{targetId} AND target_type = #{targetType}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM scores WHERE id = #{id}
+    </delete>
+
+    <select id="findByTarget" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM scores
+        WHERE target_id = #{targetId} AND target_type = #{targetType}
+    </select>
+
+    <select id="countByTarget" resultType="long">
+        SELECT COUNT(*) FROM scores WHERE target_id = #{targetId} AND target_type = #{targetType}
+    </select>
+
+    <select id="getAvgScore" resultType="java.lang.Double">
+        SELECT AVG(score) FROM scores WHERE target_id = #{targetId} AND target_type = #{targetType}
+    </select>
+
+</mapper>
