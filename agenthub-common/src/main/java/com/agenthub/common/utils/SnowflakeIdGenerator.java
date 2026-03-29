@@ -2,6 +2,8 @@ package com.agenthub.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.management.ManagementFactory;
+
 /**
  * 雪花算法ID生成器
  *
@@ -110,8 +112,21 @@ public class SnowflakeIdGenerator {
                 log.warn("环境变量MACHINE_ID解析失败，使用默认值");
             }
         }
-        // 使用进程ID作为默认机器ID
-        return (ProcessHandle.current().pid() & MAX_MACHINE_ID);
+        // 使用进程ID作为默认机器ID（Java 8兼容方式）
+        return (getProcessId() & MAX_MACHINE_ID);
+    }
+
+    /**
+     * 获取当前进程ID（Java 8兼容）
+     */
+    private static long getProcessId() {
+        try {
+            // 格式: pid@hostname
+            String runtimeName = ManagementFactory.getRuntimeMXBean().getName();
+            return Long.parseLong(runtimeName.split("@")[0]);
+        } catch (Exception e) {
+            return 1L;
+        }
     }
 
     /**

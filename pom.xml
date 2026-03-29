@@ -43,6 +43,9 @@
         <!-- Utilities -->
         <lombok.version>1.18.12</lombok.version>
         <hutool-all.version>5.8.25</hutool-all.version>
+
+        <!-- API Documentation -->
+        <springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
     </properties>
 
     <dependencyManagement>
@@ -100,6 +103,13 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool-all.version}</version>
+            </dependency>
+
+            <!-- SpringDoc OpenAPI -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc-openapi-ui.version}</version>
             </dependency>
 
             <!-- Internal Modules -->

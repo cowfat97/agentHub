@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -238,7 +239,7 @@ public class AgentServiceImpl implements AgentService {
         int start = (request.getPageNum() - 1) * request.getPageSize();
         int end = Math.min(start + request.getPageSize(), agents.size());
         List<AgentInfo> pagedAgents = start < agents.size() ?
-                agents.subList(start, end) : List.of();
+                agents.subList(start, end) : Collections.emptyList();
 
         return AgentListResponse.builder()
                 .agents(pagedAgents.stream().map(this::toDTO).collect(Collectors.toList()))
